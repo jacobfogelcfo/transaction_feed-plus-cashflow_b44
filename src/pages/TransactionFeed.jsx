@@ -84,7 +84,7 @@ export default function TransactionFeed() {
   const needsReviewCount = transactions.filter(t => t.status === "needs_review").length;
 
   return (
-    <div className="flex flex-col" style={{ height: "calc(100vh - 56px)" }}>
+    <div className="flex flex-col h-full">
       {/* Toolbar */}
       <div className="bg-card border-b border-border px-6 py-3 flex items-center gap-3 shrink-0">
         <div className="relative flex-1 max-w-xs">

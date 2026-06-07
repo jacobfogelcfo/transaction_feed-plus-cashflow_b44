@@ -37,7 +37,7 @@ export default function Reimbursements() {
   };
 
   return (
-    <div className="flex flex-col" style={{ height: "calc(100vh - 56px)" }}>
+    <div className="flex flex-col h-full">
       {/* Summary bar */}
       <div className="bg-card border-b border-border px-6 py-4 shrink-0">
         <div className="flex items-center gap-6">
