@@ -1,0 +1,45 @@
+{
+  "name": "Reimbursement",
+  "type": "object",
+  "properties": {
+    "transaction_id": {
+      "type": "string"
+    },
+    "transaction_vendor": {
+      "type": "string"
+    },
+    "transaction_amount": {
+      "type": "number"
+    },
+    "transaction_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "owed_by": {
+      "type": "string"
+    },
+    "expected_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "received_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "received"
+      ],
+      "default": "pending"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "transaction_id",
+    "owed_by"
+  ]
+}

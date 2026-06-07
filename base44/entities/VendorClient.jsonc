@@ -1,0 +1,34 @@
+{
+  "name": "VendorClient",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "vendor",
+        "client",
+        "both"
+      ]
+    },
+    "category": {
+      "type": "string"
+    },
+    "total_transacted": {
+      "type": "number"
+    },
+    "last_transaction_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "type"
+  ]
+}

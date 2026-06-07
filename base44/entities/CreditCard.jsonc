@@ -1,0 +1,33 @@
+{
+  "name": "CreditCard",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "last_four": {
+      "type": "string"
+    },
+    "balance_owed": {
+      "type": "number"
+    },
+    "credit_limit": {
+      "type": "number"
+    },
+    "payment_due_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "expected_payment_amount": {
+      "type": "number"
+    },
+    "color": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "balance_owed",
+    "credit_limit"
+  ]
+}

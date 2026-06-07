@@ -1,0 +1,72 @@
+{
+  "name": "Transaction",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "vendor_name": {
+      "type": "string"
+    },
+    "vendor_id": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "expense",
+        "income"
+      ]
+    },
+    "source_name": {
+      "type": "string"
+    },
+    "source_type": {
+      "type": "string",
+      "enum": [
+        "bank",
+        "cc",
+        "other"
+      ]
+    },
+    "connection_method": {
+      "type": "string",
+      "enum": [
+        "plaid",
+        "direct",
+        "manual"
+      ]
+    },
+    "category": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "cleared",
+        "pending",
+        "needs_review"
+      ]
+    },
+    "is_reimbursement": {
+      "type": "boolean",
+      "default": false
+    },
+    "reimbursement_id": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "date",
+    "vendor_name",
+    "amount",
+    "type"
+  ]
+}

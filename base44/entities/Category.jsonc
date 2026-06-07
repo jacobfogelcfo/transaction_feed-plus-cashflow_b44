@@ -1,0 +1,19 @@
+{
+  "name": "Category",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "is_custom": {
+      "type": "boolean",
+      "default": false
+    },
+    "color": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

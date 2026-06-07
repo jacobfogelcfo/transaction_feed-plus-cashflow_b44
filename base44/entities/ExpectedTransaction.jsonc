@@ -1,0 +1,60 @@
+{
+  "name": "ExpectedTransaction",
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number"
+    },
+    "edate": {
+      "type": "string",
+      "format": "date"
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "cc",
+        "bank"
+      ]
+    },
+    "payment_source": {
+      "type": "string"
+    },
+    "recurring": {
+      "type": "string",
+      "enum": [
+        "one-time",
+        "weekly",
+        "monthly"
+      ],
+      "default": "one-time"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "paid",
+        "hold",
+        "cleared"
+      ],
+      "default": "pending"
+    },
+    "linked_transaction_id": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "description",
+    "amount",
+    "edate",
+    "payment_method"
+  ]
+}
