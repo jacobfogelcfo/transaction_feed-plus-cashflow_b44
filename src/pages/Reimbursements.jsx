@@ -38,6 +38,10 @@ export default function Reimbursements() {
 
   return (
     <div className="flex flex-col h-full">
+      {/* Page title */}
+      <div className="px-6 py-3 border-b border-border bg-card shrink-0">
+        <h1 className="text-lg font-bold text-foreground">Reimbursements</h1>
+      </div>
       {/* Summary bar */}
       <div className="bg-card border-b border-border px-6 py-4 shrink-0">
         <div className="flex items-center gap-6">
