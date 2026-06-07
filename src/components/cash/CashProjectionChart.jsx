@@ -251,10 +251,23 @@ export default function CashProjectionChart({ expectedTransactions, currentCashB
           ))}
         </div>
         <div className="flex items-center gap-3 text-xs text-muted-foreground ml-auto">
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-0.5 bg-primary rounded" />
-            <span>Cash</span>
-          </div>
+          {cadence === "monthly" ? (
+            <>
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-2.5 bg-emerald-500 rounded-sm" />
+                <span>Income</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-2.5 bg-indigo-500 rounded-sm" />
+                <span>Expenses</span>
+              </div>
+            </>
+          ) : (
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-0.5 bg-primary rounded" />
+              <span>Cash Balance</span>
+            </div>
+          )}
           <div className="flex items-center gap-1.5">
             <div className="w-3 h-px border-b border-dashed border-red-400" />
             <span>Zero</span>
@@ -266,14 +279,15 @@ export default function CashProjectionChart({ expectedTransactions, currentCashB
       <div className="flex-1">
         <ResponsiveContainer width="100%" height="100%">
           {cadence === "monthly" ? (
-            <BarChart data={monthlyData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+            <BarChart data={monthlyData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }} barCategoryGap="25%">
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 13%, 90%)" vertical={false} />
               <XAxis dataKey="label" tick={{ fontSize: 10, fill: "hsl(220, 10%, 50%)" }} tickLine={false} axisLine={false} />
               <YAxis tick={{ fontSize: 10, fill: "hsl(220, 10%, 50%)" }} tickLine={false} axisLine={false}
                 tickFormatter={v => `$${Math.abs(v) >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`} width={50} />
               <Tooltip content={<MonthlyTooltip />} />
               <ReferenceLine y={0} stroke="#ef4444" strokeDasharray="4 4" strokeWidth={1.5} />
-              <Bar dataKey="cash" fill="hsl(237, 72%, 65%)" radius={[3, 3, 0, 0]} maxBarSize={60} />
+              <Bar dataKey="income" name="Income" fill="#10b981" radius={[3, 3, 0, 0]} maxBarSize={36} />
+              <Bar dataKey="expenses" name="Expenses" fill="#6366f1" radius={[3, 3, 0, 0]} maxBarSize={36} />
             </BarChart>
           ) : (
             <AreaChart data={dailyData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
