@@ -1,20 +1,23 @@
 import { useState, useMemo } from "react";
-import { format, addDays } from "date-fns";
 import CashProjectionChart from "@/components/cash/CashProjectionChart";
 import CashManagementTable from "@/components/cash/CashManagementTable";
 import AccountSummaryBar from "@/components/cash/AccountSummaryBar";
 import ExpectedProjectionsPanel from "@/components/cash/ExpectedProjectionsPanel";
-import { mockExpectedTransactions, mockCreditCards } from "@/lib/mockData";
-
-const CURRENT_CASH = 322968;
+import { mockExpectedTransactions, mockCreditCards, mockBankAccounts } from "@/lib/mockData";
 
 export default function Cash() {
   const [expectedTransactions, setExpectedTransactions] = useState(mockExpectedTransactions);
   const [creditCards, setCreditCards] = useState(mockCreditCards);
-  const [currentCash, setCurrentCash] = useState(CURRENT_CASH);
+  const [bankAccounts, setBankAccounts] = useState(mockBankAccounts);
   const [hiddenIds, setHiddenIds] = useState(new Set());
   const [timePreset, setTimePreset] = useState(90);
   const [cadence, setCadence] = useState("daily");
+
+  // Total bank balance across all sub-accounts
+  const currentCash = useMemo(
+    () => bankAccounts.flatMap(b => b.subAccounts).reduce((s, a) => s + a.balance, 0),
+    [bankAccounts]
+  );
 
   return (
     <div className="flex flex-col overflow-hidden h-full">
@@ -25,10 +28,10 @@ export default function Cash() {
 
       {/* Account summary bar */}
       <AccountSummaryBar
+        bankAccounts={bankAccounts}
+        onBankAccountsChange={setBankAccounts}
         creditCards={creditCards}
         onCreditCardsChange={setCreditCards}
-        bankBalance={currentCash}
-        onBankBalanceChange={setCurrentCash}
       />
 
       {/* Main split: 2/3 left | 1/3 right */}
@@ -68,7 +71,7 @@ export default function Cash() {
           </div>
         </div>
 
-        {/* RIGHT: Expected Projections */}
+        {/* RIGHT: Expected Projections — fixed panel, internally scrollable */}
         <div className="flex flex-col overflow-hidden bg-card" style={{ flex: "1 1 0%" }}>
           <ExpectedProjectionsPanel
             transactions={expectedTransactions}

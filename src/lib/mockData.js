@@ -82,10 +82,30 @@ export const mockReimbursements = [
   { id: "r2", transaction_id: "t9", transaction_vendor: "Marriott", transaction_amount: -1890.00, transaction_date: "2026-06-02", owed_by: "TechSolutions LLC", expected_date: "2026-06-15", status: "pending", notes: "Client site visit accommodation" },
 ];
 
+export const mockBankAccounts = [
+  {
+    id: "bank1",
+    institution: "Mercury",
+    logo: "https://img.logo.dev/mercury.com?token=pk_SbZDKbFgQaeSWBDdqPJMOA&size=64",
+    subAccounts: [
+      { id: "bank1a", label: "Checking", balance: 322968 },
+      { id: "bank1b", label: "Savings", balance: 50000 },
+    ],
+  },
+  {
+    id: "bank2",
+    institution: "Chase",
+    logo: "https://img.logo.dev/chase.com?token=pk_SbZDKbFgQaeSWBDdqPJMOA&size=64",
+    subAccounts: [
+      { id: "bank2a", label: "Checking", balance: 48200 },
+    ],
+  },
+];
+
 export const mockCreditCards = [
-  { id: "cc1", name: "Amex Business Platinum", last_four: "3456", balance_owed: 28650, credit_limit: 100000, payment_due_date: "2026-06-17", expected_payment_amount: 28650, color: "#2563eb" },
-  { id: "cc2", name: "Capital One Spark", last_four: "7890", balance_owed: 4320, credit_limit: 25000, payment_due_date: "2026-06-22", expected_payment_amount: 4320, color: "#dc2626" },
-  { id: "cc3", name: "Chase Ink Business", last_four: "1234", balance_owed: 12890, credit_limit: 50000, payment_due_date: "2026-06-28", expected_payment_amount: 12890, color: "#0f766e" },
+  { id: "cc1", name: "Amex Business Platinum", institution: "Amex", last_four: "3456", balance_owed: 28650, credit_limit: 100000, payment_due_date: "2026-06-17", expected_payment_amount: 28650, logo: "https://img.logo.dev/americanexpress.com?token=pk_SbZDKbFgQaeSWBDdqPJMOA&size=64" },
+  { id: "cc2", name: "Capital One Spark", institution: "Capital One", last_four: "7890", balance_owed: 4320, credit_limit: 25000, payment_due_date: "2026-06-22", expected_payment_amount: 4320, logo: "https://img.logo.dev/capitalone.com?token=pk_SbZDKbFgQaeSWBDdqPJMOA&size=64" },
+  { id: "cc3", name: "Chase Ink Business", institution: "Chase", last_four: "1234", balance_owed: 12890, credit_limit: 50000, payment_due_date: "2026-06-28", expected_payment_amount: 12890, logo: "https://img.logo.dev/chase.com?token=pk_SbZDKbFgQaeSWBDdqPJMOA&size=64" },
 ];
 
 export const mockExpectedTransactions = [

@@ -1,98 +1,128 @@
 import { useState } from "react";
-import { CreditCard, Landmark, Pencil, Check } from "lucide-react";
+import { Pencil } from "lucide-react";
 import { format } from "date-fns";
 
-function EditableValue({ value, onChange, prefix = "", suffix = "", format: fmt }) {
+const fmt = (v) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(v);
+
+function InstitutionLogo({ logo, name, size = 28 }) {
+  const [failed, setFailed] = useState(false);
+  const initials = name?.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+
+  if (logo && !failed) {
+    return (
+      <div className="rounded-md border border-border bg-white flex items-center justify-center overflow-hidden shrink-0" style={{ width: size, height: size }}>
+        <img src={logo} alt={name} className="w-full h-full object-contain p-0.5" onError={() => setFailed(true)} />
+      </div>
+    );
+  }
+  return (
+    <div className="rounded-md bg-muted flex items-center justify-center shrink-0 text-[10px] font-bold text-muted-foreground" style={{ width: size, height: size }}>
+      {initials}
+    </div>
+  );
+}
+
+function EditableBalance({ value, onChange }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState("");
-
-  const display = fmt ? fmt(value) : `${prefix}${value}${suffix}`;
 
   if (editing) {
     return (
       <input
-        autoFocus
-        type="text"
-        defaultValue={value}
+        autoFocus type="text" defaultValue={value}
         onChange={e => setDraft(e.target.value)}
-        onBlur={() => { onChange(draft || value); setEditing(false); }}
-        onKeyDown={e => { if (e.key === "Enter") { onChange(draft || value); setEditing(false); } }}
-        className="w-24 text-sm font-bold bg-muted rounded px-1.5 py-0.5 outline-none focus:ring-1 focus:ring-primary/40 tabular-nums"
+        onBlur={() => { onChange(parseFloat(draft.replace(/[^0-9.-]/g, "")) || value); setEditing(false); }}
+        onKeyDown={e => { if (e.key === "Enter") { onChange(parseFloat(draft.replace(/[^0-9.-]/g, "")) || value); setEditing(false); } }}
+        className="w-20 text-xs font-bold bg-muted rounded px-1 py-0.5 outline-none focus:ring-1 focus:ring-primary/40 tabular-nums"
       />
     );
   }
-
   return (
-    <button
-      onClick={() => { setDraft(String(value)); setEditing(true); }}
-      className="flex items-center gap-1 group"
-    >
-      <span className="font-bold text-sm text-foreground tabular-nums">{display}</span>
-      <Pencil className="w-2.5 h-2.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+    <button onClick={() => { setDraft(String(value)); setEditing(true); }} className="flex items-center gap-0.5 group">
+      <span className="text-xs font-bold text-foreground tabular-nums">{fmt(value)}</span>
+      <Pencil className="w-2 h-2 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
     </button>
   );
 }
 
-const fmt = (v) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(v);
+export default function AccountSummaryBar({ bankAccounts, onBankAccountsChange, creditCards, onCreditCardsChange }) {
+  const totalBank = bankAccounts.flatMap(b => b.subAccounts).reduce((s, a) => s + a.balance, 0);
+  const totalCCOwed = creditCards.reduce((s, c) => s + c.balance_owed, 0);
 
-export default function AccountSummaryBar({ creditCards, onCreditCardsChange, bankBalance, onBankBalanceChange }) {
+  const updateSubBalance = (bankId, subId, val) => {
+    onBankAccountsChange(bankAccounts.map(b =>
+      b.id === bankId ? { ...b, subAccounts: b.subAccounts.map(s => s.id === subId ? { ...s, balance: val } : s) } : b
+    ));
+  };
+
+  const updateCard = (id, patch) => {
+    onCreditCardsChange(creditCards.map(c => c.id === id ? { ...c, ...patch } : c));
+  };
+
   return (
-    <div className="bg-card border-b border-border px-5 py-3 flex items-center gap-0 shrink-0 overflow-x-auto">
-      {/* Bank Balance */}
-      <div className="flex items-center gap-3 pr-5 border-r border-border mr-5 shrink-0">
-        <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0">
-          <Landmark className="w-4 h-4 text-emerald-600" />
+    <div className="bg-card border-b border-border px-4 py-2.5 flex items-stretch gap-0 shrink-0 overflow-x-auto">
+
+      {/* ── BANK ACCOUNTS SECTION ── */}
+      <div className="flex items-center gap-3 pr-4 border-r border-border mr-4 shrink-0">
+        <div className="flex flex-col gap-0.5 mr-1">
+          <p className="text-[9px] text-muted-foreground uppercase tracking-wider font-semibold">Bank Accounts</p>
+          <p className="text-xs font-bold text-emerald-600 tabular-nums">{fmt(totalBank)}</p>
         </div>
-        <div>
-          <p className="text-[10px] text-muted-foreground uppercase tracking-wide font-medium">Bank Balance</p>
-          <EditableValue
-            value={bankBalance}
-            onChange={v => onBankBalanceChange(parseFloat(String(v).replace(/[^0-9.-]/g, "")) || bankBalance)}
-            fmt={fmt}
-          />
+        <div className="flex items-center gap-3">
+          {bankAccounts.map((bank, bi) => (
+            <div key={bank.id} className={`flex items-start gap-2 ${bi < bankAccounts.length - 1 ? "pr-3 border-r border-border/60" : ""}`}>
+              <InstitutionLogo logo={bank.logo} name={bank.institution} size={26} />
+              <div className="flex flex-col gap-0.5">
+                <p className="text-[10px] font-semibold text-foreground leading-tight">{bank.institution}</p>
+                {bank.subAccounts.map(sub => (
+                  <div key={sub.id} className="flex items-center gap-1.5">
+                    <span className="text-[9px] text-muted-foreground w-12 truncate">{sub.label}</span>
+                    <EditableBalance value={sub.balance} onChange={val => updateSubBalance(bank.id, sub.id, val)} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Credit Cards */}
-      <div className="flex items-center gap-4">
-        {creditCards.map((card, i) => (
-          <div key={card.id} className={`flex items-center gap-3 ${i < creditCards.length - 1 ? "pr-4 border-r border-border mr-0" : ""}`}>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: card.color + "22" }}>
-              <CreditCard className="w-4 h-4" style={{ color: card.color }} />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[10px] text-muted-foreground font-medium truncate max-w-[110px]">
-                {card.name} ••{card.last_four}
-              </p>
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-bold text-sm text-foreground tabular-nums">{fmt(card.balance_owed)}</span>
-                <span className="text-[10px] text-muted-foreground">/ {fmt(card.credit_limit)} limit</span>
+      {/* ── CREDIT CARDS SECTION ── */}
+      <div className="flex items-center gap-3 shrink-0">
+        <div className="flex flex-col gap-0.5 mr-1">
+          <p className="text-[9px] text-muted-foreground uppercase tracking-wider font-semibold">Credit Cards</p>
+          <p className="text-xs font-bold text-red-500 tabular-nums">{fmt(totalCCOwed)} owed</p>
+        </div>
+        <div className="flex items-center gap-3">
+          {creditCards.map((card, ci) => {
+            const utilPct = Math.min(100, (card.balance_owed / card.credit_limit) * 100);
+            const utilColor = utilPct > 80 ? "#ef4444" : utilPct > 50 ? "#f59e0b" : "#10b981";
+            return (
+              <div key={card.id} className={`flex items-start gap-2 ${ci < creditCards.length - 1 ? "pr-3 border-r border-border/60" : ""}`}>
+                <InstitutionLogo logo={card.logo} name={card.institution} size={26} />
+                <div className="flex flex-col gap-0.5">
+                  <p className="text-[10px] font-semibold text-foreground leading-tight truncate max-w-[90px]">{card.name}</p>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs font-bold tabular-nums" style={{ color: utilColor }}>{fmt(card.balance_owed)}</span>
+                    <span className="text-[9px] text-muted-foreground">/ {fmt(card.credit_limit)}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-[9px] text-muted-foreground">Due</span>
+                    <input
+                      type="date"
+                      value={card.payment_due_date || ""}
+                      onChange={e => updateCard(card.id, { payment_due_date: e.target.value })}
+                      className="text-[9px] text-foreground bg-transparent border-0 outline-none cursor-pointer p-0"
+                    />
+                  </div>
+                </div>
+                {/* Utilization bar */}
+                <div className="w-1.5 h-9 bg-muted rounded-full overflow-hidden self-center shrink-0">
+                  <div className="w-full rounded-full transition-all" style={{ height: `${utilPct}%`, backgroundColor: utilColor }} />
+                </div>
               </div>
-              <div className="flex items-center gap-1 mt-0.5">
-                <span className="text-[10px] text-muted-foreground">Due:</span>
-                <input
-                  type="date"
-                  value={card.payment_due_date || ""}
-                  onChange={e => {
-                    const updated = creditCards.map(c => c.id === card.id ? { ...c, payment_due_date: e.target.value } : c);
-                    onCreditCardsChange(updated);
-                  }}
-                  className="text-[10px] text-foreground bg-transparent border-0 outline-none cursor-pointer p-0"
-                />
-              </div>
-            </div>
-            {/* Utilization bar */}
-            <div className="w-1.5 h-10 bg-muted rounded-full overflow-hidden self-center shrink-0">
-              <div
-                className="w-full rounded-full transition-all"
-                style={{
-                  height: `${Math.min(100, (card.balance_owed / card.credit_limit) * 100)}%`,
-                  backgroundColor: card.balance_owed / card.credit_limit > 0.8 ? "#ef4444" : card.balance_owed / card.credit_limit > 0.5 ? "#f59e0b" : "#10b981"
-                }}
-              />
-            </div>
-          </div>
-        ))}
+            );
+          })}
+        </div>
       </div>
     </div>
   );
