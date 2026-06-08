@@ -13,72 +13,68 @@ export default function Cash() {
   const [timePreset, setTimePreset] = useState(90);
   const [cadence, setCadence] = useState("daily");
 
-  // Total bank balance across all sub-accounts
   const currentCash = useMemo(
     () => bankAccounts.flatMap(b => b.subAccounts).reduce((s, a) => s + a.balance, 0),
     [bankAccounts]
   );
 
   return (
-    <div className="flex flex-col overflow-hidden h-full">
-      {/* Page title */}
-      <div className="px-6 py-3 border-b border-border bg-card shrink-0 flex items-center gap-3">
-        <h1 className="text-lg font-bold text-foreground">Cash & Projections</h1>
-      </div>
+    <div className="flex overflow-hidden h-full">
 
-      {/* Account summary bar */}
-      <AccountSummaryBar
-        bankAccounts={bankAccounts}
-        onBankAccountsChange={setBankAccounts}
-        creditCards={creditCards}
-        onCreditCardsChange={setCreditCards}
-      />
+      {/* LEFT: title + accounts bar + chart + table */}
+      <div className="flex flex-col overflow-hidden border-r border-border" style={{ flex: "2 2 0%" }}>
+        {/* Page title */}
+        <div className="px-6 py-3 border-b border-border bg-card shrink-0">
+          <h1 className="text-lg font-bold text-foreground">Cash {"&"} Projections</h1>
+        </div>
 
-      {/* Main split: 2/3 left | 1/3 right */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* LEFT: Chart + Cash management table */}
-        <div className="flex flex-col overflow-hidden border-r border-border" style={{ flex: "2 2 0%" }}>
-          {/* Chart area */}
-          <div className="bg-card border-b border-border px-4 pt-3 pb-2 shrink-0" style={{ height: "220px" }}>
-            <div className="flex items-center justify-between mb-2">
-              <div>
-                <h3 className="text-sm font-semibold text-foreground">Cash Flow Projection</h3>
-                <p className="text-[10px] text-muted-foreground">Projected bank balance</p>
-              </div>
-            </div>
-            <div style={{ height: "155px" }}>
-              <CashProjectionChart
-                expectedTransactions={expectedTransactions}
-                currentCashBalance={currentCash}
-                creditCards={creditCards}
-                hiddenIds={hiddenIds}
-                timePreset={timePreset}
-                onTimePresetChange={setTimePreset}
-                cadence={cadence}
-                onCadenceChange={setCadence}
-              />
-            </div>
+        {/* Account summary bar */}
+        <AccountSummaryBar
+          bankAccounts={bankAccounts}
+          onBankAccountsChange={setBankAccounts}
+          creditCards={creditCards}
+          onCreditCardsChange={setCreditCards}
+        />
+
+        {/* Chart area */}
+        <div className="bg-card border-b border-border px-4 pt-3 pb-2 shrink-0" style={{ height: "220px" }}>
+          <div className="mb-2">
+            <h3 className="text-sm font-semibold text-foreground">Cash Flow Projection</h3>
+            <p className="text-[10px] text-muted-foreground">Projected bank balance</p>
           </div>
-
-          {/* Cash management projection table */}
-          <div className="flex-1 overflow-hidden">
-            <CashManagementTable
+          <div style={{ height: "155px" }}>
+            <CashProjectionChart
               expectedTransactions={expectedTransactions}
               currentCashBalance={currentCash}
               creditCards={creditCards}
-              onHiddenIdsChange={setHiddenIds}
+              hiddenIds={hiddenIds}
+              timePreset={timePreset}
+              onTimePresetChange={setTimePreset}
+              cadence={cadence}
+              onCadenceChange={setCadence}
             />
           </div>
         </div>
 
-        {/* RIGHT: Expected Projections — fixed panel, internally scrollable */}
-        <div className="flex flex-col overflow-hidden bg-card" style={{ flex: "1 1 0%" }}>
-          <ExpectedProjectionsPanel
-            transactions={expectedTransactions}
-            onChange={setExpectedTransactions}
+        {/* Cash management projection table */}
+        <div className="flex-1 overflow-hidden">
+          <CashManagementTable
+            expectedTransactions={expectedTransactions}
+            currentCashBalance={currentCash}
+            creditCards={creditCards}
+            onHiddenIdsChange={setHiddenIds}
           />
         </div>
       </div>
+
+      {/* RIGHT: Expected Projections — full height from top */}
+      <div className="flex flex-col overflow-hidden bg-card" style={{ flex: "1 1 0%" }}>
+        <ExpectedProjectionsPanel
+          transactions={expectedTransactions}
+          onChange={setExpectedTransactions}
+        />
+      </div>
+
     </div>
   );
 }
