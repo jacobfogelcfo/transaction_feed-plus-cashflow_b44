@@ -60,20 +60,22 @@ export default function AccountSummaryBar({ bankAccounts, onBankAccountsChange, 
   };
 
   return (
-    <div className="bg-card border-b border-border px-4 py-2.5 flex items-stretch gap-0 shrink-0 overflow-x-auto">
+    <div className="bg-card flex flex-col shrink-0 divide-y divide-border">
 
       {/* ── BANK ACCOUNTS SECTION ── */}
-      <div className="flex items-center gap-3 pr-4 border-r border-border mr-4 shrink-0">
-        <div className="flex flex-col gap-0.5 mr-1">
-          <p className="text-[9px] text-muted-foreground uppercase tracking-wider font-semibold">Bank Accounts</p>
-          <p className="text-xs font-bold text-emerald-600 tabular-nums">{fmt(totalBank)}</p>
+      <div className="px-4 py-3 border-b border-border">
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <p className="text-[9px] text-muted-foreground uppercase tracking-wider font-semibold">Bank Accounts</p>
+            <p className="text-xs font-bold text-emerald-600 tabular-nums">{fmt(totalBank)}</p>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          {bankAccounts.map((bank, bi) => (
-            <div key={bank.id} className={`flex items-start gap-2 ${bi < bankAccounts.length - 1 ? "pr-3 border-r border-border/60" : ""}`}>
+        <div className="flex flex-wrap gap-4">
+          {bankAccounts.map(bank => (
+            <div key={bank.id} className="flex items-start gap-2">
               <InstitutionLogo logo={bank.logo} name={bank.institution} size={26} />
               <div className="flex flex-col gap-0.5">
-                <p className="text-[10px] font-semibold text-foreground leading-tight">{bank.institution}</p>
+                <p className="text-[10px] font-semibold text-foreground">{bank.institution}</p>
                 {bank.subAccounts.map(sub => (
                   <div key={sub.id} className="flex items-center gap-1.5">
                     <span className="text-[9px] text-muted-foreground w-12 truncate">{sub.label}</span>
@@ -87,20 +89,22 @@ export default function AccountSummaryBar({ bankAccounts, onBankAccountsChange, 
       </div>
 
       {/* ── CREDIT CARDS SECTION ── */}
-      <div className="flex items-center gap-3 shrink-0">
-        <div className="flex flex-col gap-0.5 mr-1">
-          <p className="text-[9px] text-muted-foreground uppercase tracking-wider font-semibold">Credit Cards</p>
-          <p className="text-xs font-bold text-red-500 tabular-nums">{fmt(totalCCOwed)} owed</p>
+      <div className="px-4 py-3">
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <p className="text-[9px] text-muted-foreground uppercase tracking-wider font-semibold">Credit Cards</p>
+            <p className="text-xs font-bold text-red-500 tabular-nums">{fmt(totalCCOwed)} owed</p>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          {creditCards.map((card, ci) => {
+        <div className="flex flex-wrap gap-4">
+          {creditCards.map(card => {
             const utilPct = Math.min(100, (card.balance_owed / card.credit_limit) * 100);
             const utilColor = utilPct > 80 ? "#ef4444" : utilPct > 50 ? "#f59e0b" : "#10b981";
             return (
-              <div key={card.id} className={`flex items-start gap-2 ${ci < creditCards.length - 1 ? "pr-3 border-r border-border/60" : ""}`}>
+              <div key={card.id} className="flex items-start gap-2">
                 <InstitutionLogo logo={card.logo} name={card.institution} size={26} />
                 <div className="flex flex-col gap-0.5">
-                  <p className="text-[10px] font-semibold text-foreground leading-tight truncate max-w-[90px]">{card.name}</p>
+                  <p className="text-[10px] font-semibold text-foreground truncate max-w-[90px]">{card.name}</p>
                   <div className="flex items-center gap-1">
                     <span className="text-xs font-bold tabular-nums" style={{ color: utilColor }}>{fmt(card.balance_owed)}</span>
                     <span className="text-[9px] text-muted-foreground">/ {fmt(card.credit_limit)}</span>
