@@ -271,6 +271,23 @@ function EntityCard({ entity, connectors, onDeleteConnector, onAddConnector, onD
       {expanded && (
         <div className="px-4 pb-4 space-y-3 border-t border-border pt-3">
 
+          {/* Add Connector */}
+          {addingConnector ? (
+            <AddConnectorForm
+              entityId={entity.id}
+              existingConnectors={connectors}
+              onSave={handleAdd}
+              onCancel={() => setAddingConnector(false)}
+            />
+          ) : (
+            <button
+              onClick={() => setAddingConnector(true)}
+              className="flex items-center gap-1.5 text-xs text-primary hover:underline"
+            >
+              <Plus className="w-3.5 h-3.5" /> Add Connector
+            </button>
+          )}
+
           {/* Accounting Software */}
           <div>
             <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Accounting Software</p>
@@ -312,23 +329,6 @@ function EntityCard({ entity, connectors, onDeleteConnector, onAddConnector, onD
                 ))}
               </div>
             </div>
-          )}
-
-          {/* Add Connector */}
-          {addingConnector ? (
-            <AddConnectorForm
-              entityId={entity.id}
-              existingConnectors={connectors}
-              onSave={handleAdd}
-              onCancel={() => setAddingConnector(false)}
-            />
-          ) : (
-            <button
-              onClick={() => setAddingConnector(true)}
-              className="flex items-center gap-1.5 text-xs text-primary hover:underline mt-1"
-            >
-              <Plus className="w-3.5 h-3.5" /> Add Connector
-            </button>
           )}
         </div>
       )}
