@@ -1,39 +1,23 @@
 import { useState } from "react";
-import { format, formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import {
-  Plus, Pencil, Trash2, CheckCircle2, AlertCircle, WifiOff,
-  ChevronDown, ChevronRight, Building2, Globe
+  Plus, Trash2, CheckCircle2, AlertCircle, WifiOff,
+  ChevronDown, ChevronRight, Building2
 } from "lucide-react";
 
 // ── Mock Data ─────────────────────────────────────────────────────────────────
 const INITIAL_ENTITIES = [
-  {
-    id: "ent1",
-    name: "Acme Corp",
-    legal_name: "Acme Corporation Inc.",
-    country: "us",
-    ein_or_tax_id: "82-1234567",
-    notes: "Main operating entity",
-  },
-  {
-    id: "ent2",
-    name: "Acme Israel",
-    legal_name: "Acme Technologies Ltd.",
-    country: "israel",
-    ein_or_tax_id: "514-123456",
-    notes: "R&D subsidiary — Israel-based",
-  },
+  { id: "ent1", name: "Acme Corp", legal_name: "Acme Corporation Inc.", country: "us", ein_or_tax_id: "82-1234567", notes: "Main operating entity" },
+  { id: "ent2", name: "Acme Israel", legal_name: "Acme Technologies Ltd.", country: "israel", ein_or_tax_id: "514-123456", notes: "R&D subsidiary — Israel-based" },
 ];
 
 const INITIAL_CONNECTORS = [
-  // Acme Corp
   { id: "c1", entity_id: "ent1", software: "quickbooks", account_name: "Acme Corp - QBO", account_identifier: "acmecorp.qbo.intuit.com", connection_method: "api", is_accounting_software: true, last_sync: "2026-06-09T08:14:00Z", status: "active", notes: "" },
   { id: "c2", entity_id: "ent1", software: "bank_account", account_name: "Mercury Checking", account_identifier: "••• 2968", connection_method: "plaid", is_accounting_software: false, last_sync: "2026-06-09T06:00:00Z", status: "active", notes: "" },
   { id: "c3", entity_id: "ent1", software: "bank_account", account_name: "Chase Checking", account_identifier: "••• 8200", connection_method: "direct", is_accounting_software: false, last_sync: "2026-06-08T22:00:00Z", status: "active", notes: "" },
   { id: "c4", entity_id: "ent1", software: "shopify", account_name: "Acme Store", account_identifier: "acme-store.myshopify.com", connection_method: "api", is_accounting_software: false, last_sync: "2026-06-09T07:30:00Z", status: "active", notes: "" },
   { id: "c5", entity_id: "ent1", software: "stripe", account_name: "Stripe Payments", account_identifier: "acct_1Mx3cRBN", connection_method: "api", is_accounting_software: false, last_sync: "2026-06-09T05:45:00Z", status: "error", notes: "Webhook verification failed" },
   { id: "c6", entity_id: "ent1", software: "gusto", account_name: "Acme Payroll", account_identifier: "acme-corp@gusto.com", connection_method: "api", is_accounting_software: false, last_sync: "2026-06-06T12:00:00Z", status: "active", notes: "" },
-  // Acme Israel
   { id: "c7", entity_id: "ent2", software: "xero", account_name: "Acme Israel - Xero", account_identifier: "acmeil.xero.com", connection_method: "api", is_accounting_software: true, last_sync: "2026-06-09T07:00:00Z", status: "active", notes: "" },
   { id: "c8", entity_id: "ent2", software: "bank_account", account_name: "Bank Hapoalim", account_identifier: "••• 4412", connection_method: "direct", is_accounting_software: false, last_sync: "2026-06-08T18:00:00Z", status: "active", notes: "" },
   { id: "c9", entity_id: "ent2", software: "bank_account", account_name: "Mercury (USD)", account_identifier: "••• 1104", connection_method: "plaid", is_accounting_software: false, last_sync: "2026-06-07T09:00:00Z", status: "disconnected", notes: "Re-auth required" },
@@ -41,17 +25,9 @@ const INITIAL_CONNECTORS = [
 
 // ── Config ────────────────────────────────────────────────────────────────────
 const SOFTWARE_LABELS = {
-  quickbooks: "QuickBooks",
-  xero: "Xero",
-  bank_account: "Bank Account",
-  shopify: "Shopify",
-  stripe: "Stripe",
-  paypal: "PayPal",
-  gusto: "Gusto",
-  rippling: "Rippling",
-  ramp: "Ramp",
-  brex: "Brex",
-  other: "Other",
+  quickbooks: "QuickBooks", xero: "Xero", bank_account: "Bank Account",
+  shopify: "Shopify", stripe: "Stripe", paypal: "PayPal", gusto: "Gusto",
+  rippling: "Rippling", ramp: "Ramp", brex: "Brex", other: "Other",
 };
 
 const SOFTWARE_LOGOS = {
@@ -67,7 +43,7 @@ const SOFTWARE_LOGOS = {
   brex: "https://img.logo.dev/brex.com?token=pk_SbZDKbFgQaeSWBDdqPJMOA&size=64",
 };
 
-const CONNECTION_COLORS = {
+const CONNECTION_STYLES = {
   plaid: "bg-indigo-50 text-indigo-700 border-indigo-200",
   direct: "bg-emerald-50 text-emerald-700 border-emerald-200",
   api: "bg-blue-50 text-blue-700 border-blue-200",
@@ -75,13 +51,13 @@ const CONNECTION_COLORS = {
 };
 
 const STATUS_CONFIG = {
-  active: { icon: CheckCircle2, color: "text-emerald-500", label: "Active" },
-  error: { icon: AlertCircle, color: "text-red-500", label: "Error" },
-  disconnected: { icon: WifiOff, color: "text-muted-foreground", label: "Disconnected" },
+  active: { color: "text-emerald-500", dotColor: "bg-emerald-500", label: "Active" },
+  error: { color: "text-red-500", dotColor: "bg-red-500", label: "Error" },
+  disconnected: { color: "text-slate-400", dotColor: "bg-slate-400", label: "Disconnected" },
 };
 
 // ── Sub-components ─────────────────────────────────────────────────────────────
-function SoftwareLogo({ software, size = 28 }) {
+function SoftwareLogo({ software, size = 36 }) {
   const [failed, setFailed] = useState(false);
   const url = SOFTWARE_LOGOS[software];
   const label = SOFTWARE_LABELS[software] || software;
@@ -89,72 +65,86 @@ function SoftwareLogo({ software, size = 28 }) {
 
   if (url && !failed) {
     return (
-      <div className="rounded-lg border border-border bg-white flex items-center justify-center overflow-hidden shrink-0" style={{ width: size, height: size }}>
+      <div className="rounded-xl border border-border bg-white flex items-center justify-center overflow-hidden shrink-0" style={{ width: size, height: size }}>
         <img src={url} alt={label} className="w-full h-full object-contain p-0.5" onError={() => setFailed(true)} />
       </div>
     );
   }
   return (
-    <div className="rounded-lg bg-muted flex items-center justify-center shrink-0 text-[9px] font-bold text-muted-foreground" style={{ width: size, height: size }}>
+    <div className="rounded-xl bg-muted flex items-center justify-center shrink-0 text-xs font-bold text-muted-foreground" style={{ width: size, height: size }}>
       {initials}
     </div>
   );
 }
 
 function ConnectorCard({ connector, onDelete }) {
-  const { icon: StatusIcon, color, label: statusLabel } = STATUS_CONFIG[connector.status] || STATUS_CONFIG.active;
+  const status = STATUS_CONFIG[connector.status] || STATUS_CONFIG.active;
 
   return (
-    <div className={`flex items-start gap-3 p-3 rounded-lg border ${connector.status === "error" ? "border-red-200 bg-red-50/30" : connector.status === "disconnected" ? "border-border bg-muted/20" : "border-border bg-card"}`}>
-      <SoftwareLogo software={connector.software} size={32} />
+    <div className={`group relative flex flex-col gap-3 p-4 rounded-xl border bg-white transition-shadow hover:shadow-sm ${connector.status === "error" ? "border-red-200" : connector.status === "disconnected" ? "border-slate-200" : "border-slate-200"}`}>
+      {/* Delete button */}
+      <button
+        onClick={() => onDelete(connector.id)}
+        className="absolute top-2 right-2 p-1 rounded-md opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all"
+      >
+        <Trash2 className="w-3 h-3" />
+      </button>
 
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-          <span className="text-xs font-semibold text-foreground">{connector.account_name}</span>
-          {connector.is_accounting_software && (
-            <span className="text-[9px] font-semibold bg-primary/10 text-primary border border-primary/20 rounded px-1.5 py-0.5">Accounting</span>
-          )}
+      {/* Logo + Name */}
+      <div className="flex items-center gap-3">
+        <SoftwareLogo software={connector.software} size={36} />
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-slate-900 leading-tight">{connector.account_name}</p>
+          <p className="text-xs text-slate-400 mt-0.5 truncate">{connector.account_identifier}</p>
         </div>
-        <p className="text-[10px] text-muted-foreground truncate">{connector.account_identifier}</p>
+      </div>
 
-        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-          <span className={`text-[9px] font-medium border rounded px-1.5 py-0.5 ${CONNECTION_COLORS[connector.connection_method]}`}>
-            {connector.connection_method}
+      {/* Status row */}
+      <div className="flex items-center gap-1.5 flex-wrap">
+        <span className={`w-2 h-2 rounded-full shrink-0 ${status.dotColor}`} />
+        <span className={`text-xs font-medium ${status.color}`}>{status.label}</span>
+        {connector.last_sync && (
+          <span className="text-xs text-slate-400">
+            synced {formatDistanceToNow(new Date(connector.last_sync), { addSuffix: true })}
           </span>
-          <div className={`flex items-center gap-1 text-[9px] font-medium ${color}`}>
-            <StatusIcon className="w-3 h-3" />
-            {statusLabel}
-          </div>
-          {connector.last_sync && (
-            <span className="text-[9px] text-muted-foreground">
-              synced {formatDistanceToNow(new Date(connector.last_sync), { addSuffix: true })}
-            </span>
-          )}
-        </div>
-        {connector.notes && (
-          <p className="text-[10px] text-muted-foreground mt-1 italic">{connector.notes}</p>
         )}
       </div>
 
-      <button
-        onClick={() => onDelete(connector.id)}
-        className="p-1 rounded hover:bg-red-50 text-muted-foreground hover:text-red-500 transition-colors shrink-0 opacity-0 group-hover:opacity-100"
-      >
-        <Trash2 className="w-3.5 h-3.5" />
-      </button>
+      {/* Notes */}
+      {connector.notes && (
+        <p className="text-xs text-slate-500 italic -mt-1">{connector.notes}</p>
+      )}
+
+      {/* Method badge */}
+      <div>
+        <span className={`inline-flex items-center text-[11px] font-medium px-2 py-0.5 rounded-md border ${CONNECTION_STYLES[connector.connection_method]}`}>
+          {connector.connection_method}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function ConnectorSection({ title, connectors, onDelete, emptyWarning }) {
+  return (
+    <div className="flex flex-col gap-2">
+      <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">{title}</p>
+      {connectors.length > 0 ? (
+        connectors.map(c => <ConnectorCard key={c.id} connector={c} onDelete={onDelete} />)
+      ) : emptyWarning ? (
+        <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2.5">
+          <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+          No accounting software connected
+        </div>
+      ) : null}
     </div>
   );
 }
 
 function AddConnectorForm({ entityId, existingConnectors, onSave, onCancel }) {
   const [form, setForm] = useState({
-    software: "bank_account",
-    account_name: "",
-    account_identifier: "",
-    connection_method: "direct",
-    is_accounting_software: false,
-    status: "active",
-    notes: "",
+    software: "bank_account", account_name: "", account_identifier: "",
+    connection_method: "direct", is_accounting_software: false, status: "active", notes: "",
   });
 
   const hasAccounting = existingConnectors.some(c => c.is_accounting_software);
@@ -162,26 +152,18 @@ function AddConnectorForm({ entityId, existingConnectors, onSave, onCancel }) {
 
   const save = () => {
     if (!form.account_name) return;
-    onSave({
-      ...form,
-      id: `c${Date.now()}`,
-      entity_id: entityId,
-      is_accounting_software: isAccountingSoftware,
-      last_sync: null,
-    });
+    onSave({ ...form, id: `c${Date.now()}`, entity_id: entityId, is_accounting_software: isAccountingSoftware, last_sync: null });
   };
 
   return (
     <div className="border border-primary/20 rounded-xl bg-primary/5 p-4 space-y-3">
       <p className="text-xs font-semibold text-foreground">Add Connector</p>
-
       {hasAccounting && isAccountingSoftware && (
-        <div className="flex items-center gap-2 text-[10px] text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1.5">
+        <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1.5">
           <AlertCircle className="w-3 h-3 shrink-0" />
           This entity already has an accounting software connected.
         </div>
       )}
-
       <div className="grid grid-cols-2 gap-2">
         <div>
           <label className="text-[10px] text-muted-foreground block mb-1">Software</label>
@@ -231,45 +213,44 @@ function EntityCard({ entity, connectors, onDeleteConnector, onAddConnector, onD
   const [expanded, setExpanded] = useState(true);
   const [addingConnector, setAddingConnector] = useState(false);
 
-  const accounting = connectors.find(c => c.is_accounting_software);
+  const accounting = connectors.filter(c => c.is_accounting_software);
   const banks = connectors.filter(c => c.software === "bank_account");
   const others = connectors.filter(c => !c.is_accounting_software && c.software !== "bank_account");
 
-  const handleAdd = (connector) => {
-    onAddConnector(connector);
-    setAddingConnector(false);
-  };
+  const handleAdd = (connector) => { onAddConnector(connector); setAddingConnector(false); };
 
   return (
-    <div className="bg-card rounded-xl border border-border overflow-hidden">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
       {/* Entity header */}
-      <div className="px-4 py-3 flex items-center gap-3 cursor-pointer hover:bg-muted/20 transition-colors" onClick={() => setExpanded(e => !e)}>
-        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-          <Building2 className="w-4 h-4 text-primary" />
+      <div
+        className="px-5 py-4 flex items-center gap-3 cursor-pointer hover:bg-slate-50 transition-colors"
+        onClick={() => setExpanded(e => !e)}
+      >
+        <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+          <Building2 className="w-4.5 h-4.5 text-primary" />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="text-sm font-bold text-foreground">{entity.name}</h3>
-            <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded border flex items-center gap-1 ${entity.country === "us" ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-amber-50 text-amber-700 border-amber-200"}`}>
-              <Globe className="w-2.5 h-2.5" />
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <h3 className="text-sm font-bold text-slate-900">{entity.name}</h3>
+            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border flex items-center gap-1 ${entity.country === "us" ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-amber-50 text-amber-700 border-amber-200"}`}>
               {entity.country === "us" ? "🇺🇸 US" : "🇮🇱 Israel"}
             </span>
             {entity.ein_or_tax_id && (
-              <span className="text-[9px] text-muted-foreground">{entity.country === "us" ? "EIN" : "Tax ID"}: {entity.ein_or_tax_id}</span>
+              <span className="text-xs text-slate-500">{entity.country === "us" ? "EIN" : "Tax ID"}: {entity.ein_or_tax_id}</span>
             )}
           </div>
           {entity.legal_name && entity.legal_name !== entity.name && (
-            <p className="text-[10px] text-muted-foreground">{entity.legal_name}</p>
+            <p className="text-xs text-slate-400 mt-0.5">{entity.legal_name}</p>
           )}
         </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <span className="text-[10px] text-muted-foreground">{connectors.length} connector{connectors.length !== 1 ? "s" : ""}</span>
-          {expanded ? <ChevronDown className="w-4 h-4 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
+        <div className="flex items-center gap-2 shrink-0 text-slate-500">
+          <span className="text-xs">{connectors.length} connector{connectors.length !== 1 ? "s" : ""}</span>
+          {expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
         </div>
       </div>
 
       {expanded && (
-        <div className="px-4 pb-4 space-y-3 border-t border-border pt-3">
+        <div className="border-t border-slate-100 px-5 pb-5 pt-4 space-y-5">
 
           {/* Add Connector */}
           {addingConnector ? (
@@ -282,54 +263,31 @@ function EntityCard({ entity, connectors, onDeleteConnector, onAddConnector, onD
           ) : (
             <button
               onClick={() => setAddingConnector(true)}
-              className="flex items-center gap-1.5 text-xs text-primary hover:underline"
+              className="flex items-center gap-1.5 text-xs text-primary font-medium hover:underline"
             >
               <Plus className="w-3.5 h-3.5" /> Add Connector
             </button>
           )}
 
-          {/* Accounting Software */}
-          <div>
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Accounting Software</p>
-            {accounting ? (
-              <div className="group">
-                <ConnectorCard connector={accounting} onDelete={onDeleteConnector} />
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 text-[10px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                No accounting software connected
-              </div>
-            )}
+          {/* 3-column connector grid */}
+          <div className="grid grid-cols-3 gap-5">
+            <ConnectorSection
+              title="Accounting Software"
+              connectors={accounting}
+              onDelete={onDeleteConnector}
+              emptyWarning
+            />
+            <ConnectorSection
+              title="Bank Accounts"
+              connectors={banks}
+              onDelete={onDeleteConnector}
+            />
+            <ConnectorSection
+              title="Other Connections"
+              connectors={others}
+              onDelete={onDeleteConnector}
+            />
           </div>
-
-          {/* Bank Accounts */}
-          {banks.length > 0 && (
-            <div>
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Bank Accounts</p>
-              <div className="space-y-2">
-                {banks.map(c => (
-                  <div key={c.id} className="group">
-                    <ConnectorCard connector={c} onDelete={onDeleteConnector} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Other Connections */}
-          {others.length > 0 && (
-            <div>
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Other Connections</p>
-              <div className="space-y-2">
-                {others.map(c => (
-                  <div key={c.id} className="group">
-                    <ConnectorCard connector={c} onDelete={onDeleteConnector} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       )}
     </div>
@@ -345,7 +303,7 @@ function AddEntityForm({ onSave, onCancel }) {
   };
 
   return (
-    <div className="bg-card rounded-xl border border-primary/30 p-4 space-y-3">
+    <div className="bg-white rounded-2xl border border-primary/30 shadow-sm p-5 space-y-3">
       <p className="text-sm font-semibold text-foreground">New Business Entity</p>
       <div className="grid grid-cols-2 gap-3">
         <div>
@@ -399,20 +357,22 @@ export default function Entities() {
   const deleteConnector = (id) => setConnectors(prev => prev.filter(c => c.id !== id));
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
-      <div className="px-6 py-3 border-b border-border bg-card shrink-0 flex items-center justify-between">
+    <div className="flex flex-col h-full overflow-hidden bg-slate-50">
+      {/* Header */}
+      <div className="px-6 py-4 border-b border-slate-200 bg-white shrink-0 flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-bold text-foreground">Business Entities</h1>
-          <p className="text-[11px] text-muted-foreground">{entities.length} entit{entities.length !== 1 ? "ies" : "y"} · {connectors.length} connectors</p>
+          <h1 className="text-xl font-bold text-slate-900">Business Entities</h1>
+          <p className="text-xs text-slate-400 mt-0.5">{entities.length} entit{entities.length !== 1 ? "ies" : "y"} · {connectors.length} connectors</p>
         </div>
         <button
           onClick={() => setAddingEntity(v => !v)}
-          className="flex items-center gap-1.5 text-xs bg-primary text-primary-foreground px-3 py-1.5 rounded-lg hover:bg-primary/90 transition-colors"
+          className="flex items-center gap-1.5 text-sm font-medium bg-primary text-white px-4 py-2 rounded-xl hover:bg-primary/90 transition-colors shadow-sm"
         >
-          <Plus className="w-3.5 h-3.5" /> Add Entity
+          <Plus className="w-4 h-4" /> Add Entity
         </button>
       </div>
 
+      {/* Content */}
       <div className="flex-1 overflow-auto px-6 py-5 space-y-4">
         {addingEntity && (
           <AddEntityForm onSave={addEntity} onCancel={() => setAddingEntity(false)} />
@@ -428,8 +388,8 @@ export default function Entities() {
           />
         ))}
         {entities.length === 0 && !addingEntity && (
-          <div className="text-center text-sm text-muted-foreground py-16">
-            No entities yet. Click "Add Entity" to get started.
+          <div className="text-center text-sm text-slate-400 py-20">
+            No entities yet. Click "+ Add Entity" to get started.
           </div>
         )}
       </div>
