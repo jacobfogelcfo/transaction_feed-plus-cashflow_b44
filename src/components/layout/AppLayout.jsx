@@ -1,7 +1,8 @@
 import { Link, useLocation } from "react-router-dom";
-import { BarChart3, ArrowLeftRight, RefreshCw, DollarSign, Building2 } from "lucide-react";
+import { BarChart3, ArrowLeftRight, RefreshCw, DollarSign, Building2, LayoutDashboard } from "lucide-react";
 
 const navItems = [
+  { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { path: "/", label: "Transaction Feed", icon: ArrowLeftRight },
   { path: "/reimbursements", label: "Reimbursements", icon: RefreshCw },
   { path: "/cash", label: "Cash & Projections", icon: DollarSign },

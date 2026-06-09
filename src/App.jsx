@@ -9,6 +9,7 @@ import AppLayout from '@/components/layout/AppLayout';
 import TransactionFeed from '@/pages/TransactionFeed';
 import Reimbursements from '@/pages/Reimbursements';
 import Cash from '@/pages/Cash';
+import Dashboard from '@/pages/Dashboard';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -33,6 +34,7 @@ const AuthenticatedApp = () => {
   return (
     <AppLayout>
       <Routes>
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/" element={<TransactionFeed />} />
         <Route path="/reimbursements" element={<Reimbursements />} />
         <Route path="/cash" element={<Cash />} />
