@@ -1,0 +1,12 @@
+{
+  "name": "BusinessEntity",
+  "type": "object",
+  "properties": {
+    "name": { "type": "string" },
+    "legal_name": { "type": "string" },
+    "country": { "type": "string", "enum": ["us", "israel"], "default": "us" },
+    "ein_or_tax_id": { "type": "string" },
+    "notes": { "type": "string" }
+  },
+  "required": ["name"]
+}

@@ -10,6 +10,7 @@ import TransactionFeed from '@/pages/TransactionFeed';
 import Reimbursements from '@/pages/Reimbursements';
 import Cash from '@/pages/Cash';
 import Dashboard from '@/pages/Dashboard';
+import Entities from '@/pages/Entities';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -38,6 +39,7 @@ const AuthenticatedApp = () => {
         <Route path="/" element={<TransactionFeed />} />
         <Route path="/reimbursements" element={<Reimbursements />} />
         <Route path="/cash" element={<Cash />} />
+        <Route path="/entities" element={<Entities />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </AppLayout>

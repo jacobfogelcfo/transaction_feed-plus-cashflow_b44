@@ -1,0 +1,19 @@
+{
+  "name": "EntityConnector",
+  "type": "object",
+  "properties": {
+    "entity_id": { "type": "string" },
+    "software": {
+      "type": "string",
+      "enum": ["quickbooks", "xero", "bank_account", "shopify", "stripe", "paypal", "gusto", "rippling", "ramp", "brex", "other"]
+    },
+    "account_name": { "type": "string" },
+    "account_identifier": { "type": "string" },
+    "connection_method": { "type": "string", "enum": ["plaid", "direct", "api", "manual"], "default": "direct" },
+    "is_accounting_software": { "type": "boolean", "default": false },
+    "last_sync": { "type": "string", "format": "date-time" },
+    "status": { "type": "string", "enum": ["active", "error", "disconnected"], "default": "active" },
+    "notes": { "type": "string" }
+  },
+  "required": ["entity_id", "software", "account_name"]
+}
